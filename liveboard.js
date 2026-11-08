@@ -28,7 +28,18 @@
 
   var CSS = '\
 html.lb-open,html.lb-open body{overflow:hidden}\
-.lb{position:fixed;inset:0;z-index:2000;display:flex;flex-direction:column;background:var(--bg,#fff);color:var(--fg,#10163a)}\
+.lb{display:flex;flex-direction:column;background:var(--bg,#fff);color:var(--fg,#10163a)}\
+.lb-full{position:fixed;inset:0;z-index:2000}\
+.lb-inline{position:relative;width:100%;height:100%;border:1px solid var(--line,#dde3f3);border-radius:12px;overflow:hidden;min-height:0}\
+.lb-inline .lb-xf,.lb-full .lb-xi{display:none}\
+.lb-inline .lb-h{padding:.3rem .5rem;gap:.3rem}\
+.lb-inline .lb-b{padding:.25rem .55rem;font-size:.78rem}\
+.lb-inline .lb-body{flex-direction:column}\
+.lb-inline .lb-tools{flex-direction:row;width:auto;border-right:0;border-bottom:1px solid var(--line,#dde3f3);overflow-x:auto;overflow-y:hidden;align-items:center;padding:.3rem .4rem}\
+.lb-inline .lb-hr{width:1px;height:26px;margin:0 .2rem}\
+.lb-inline .lb-sw{grid-template-columns:repeat(8,1fr)}\
+.lb-inline .lb-tools>*{flex:0 0 auto}\
+.lb-inline .lb-tools .lb-b{min-width:2rem;padding:.25rem}\
 .lb *{box-sizing:border-box}\
 .lb-h{display:flex;align-items:center;gap:.5rem;padding:.5rem .75rem;border-bottom:1px solid var(--line,#dde3f3);background:var(--card,#fff);flex-wrap:wrap}\
 .lb-h>b{font-weight:800}.lb-sp{flex:1}\
@@ -53,7 +64,7 @@ html.lb-open,html.lb-open body{overflow:hidden}\
 .lb-view .lb-b{padding:.3rem .6rem}.lb-view span{font-size:.8rem;min-width:3rem;text-align:center;font-weight:700}\
 .lb-bn{position:absolute;left:50%;top:.7rem;transform:translateX(-50%);max-width:92%;background:var(--card,#fff);color:var(--fg,#10163a);border:1.5px solid var(--sun,#f5a524);border-radius:12px;padding:.5rem .9rem;font-size:.9rem;z-index:3;box-shadow:0 4px 14px rgba(0,0,0,.18);display:none;text-align:center}\
 .lb-bn.on{display:block}.lb-bn .lb-b{margin-left:.5rem;padding:.25rem .6rem}\
-@media(max-width:760px){.lb-body{flex-direction:column-reverse}.lb-tools{flex-direction:row;width:auto;border-right:0;border-top:1px solid var(--line,#dde3f3);overflow-x:auto;overflow-y:hidden;align-items:center;padding:.4rem}.lb-hr{width:1px;height:28px;margin:0 .2rem}.lb-sw{grid-template-columns:repeat(8,1fr)}.lb-tools>*{flex:0 0 auto}.lb-h{padding:.4rem .5rem}.lb-view{bottom:.5rem}}';
+@media(max-width:760px){.lb-full .lb-body{flex-direction:column-reverse}.lb-full .lb-tools{flex-direction:row;width:auto;border-right:0;border-top:1px solid var(--line,#dde3f3);overflow-x:auto;overflow-y:hidden;align-items:center;padding:.4rem}.lb-full .lb-hr{width:1px;height:28px;margin:0 .2rem}.lb-full .lb-sw{grid-template-columns:repeat(8,1fr)}.lb-full .lb-tools>*{flex:0 0 auto}.lb-h{padding:.4rem .5rem}.lb-view{bottom:.5rem}}';
 
   function injectCss() {
     if (document.getElementById('lb-css')) return;
@@ -75,12 +86,13 @@ html.lb-open,html.lb-open body{overflow:hidden}\
         '<div class="lb-hr"></div><button class="lb-b" id="lb-undo" title="Undo (Ctrl+Z)" aria-label="Undo">↶</button><button class="lb-b" id="lb-redo" title="Redo (Ctrl+Y)" aria-label="Redo">↷</button>' +
         '<button class="lb-b" id="lb-clear" title="Clear the whole board" aria-label="Clear board">🗑</button>';
     }
-    return '<div class="lb-h"><button class="lb-b" id="lb-back">← Back to class</button><b>TTE LiveBoard · ' + esc(o.title || '') + '</b><span class="lb-st" id="lb-st">Loading…</span><span class="lb-sp"></span>' +
-      (o.meetUrl ? '<a class="lb-b pri" id="lb-meet" href="' + esc(o.meetUrl) + '" target="_blank" rel="noopener">Join Google Meet</a>' : '') +
+    return '<div class="lb-h"><button class="lb-b lb-xf" id="lb-back">← Back to class</button><b class="lb-xf">TTE LiveBoard · ' + esc(o.title || '') + '</b><span class="lb-st" id="lb-st">Loading…</span><span class="lb-sp"></span>' +
+      (o.meetUrl ? '<a class="lb-b pri lb-xf" id="lb-meet" href="' + esc(o.meetUrl) + '" target="_blank" rel="noopener">Join Google Meet</a>' : '') +
       (writer ? '<button class="lb-b" id="lb-pen" title="Let another facilitator write">Put the pen down</button>' : '') +
-      '<button class="lb-b" id="lb-pdf" title="Download as PDF">⬇ PDF</button><button class="lb-b" id="lb-png" title="Download as image">⬇ Image</button>' +
-      (writer && o.saveNotes ? '<button class="lb-b" id="lb-notes" title="Save this board as the class notes for students">💾 Save as class notes</button>' : '') +
-      '<button class="lb-b" id="lb-fs" title="Full screen">⛶</button></div>' +
+      '<button class="lb-b" id="lb-pdf" title="Download as PDF">⬇ PDF</button><button class="lb-b lb-xf" id="lb-png" title="Download as image">⬇ Image</button>' +
+      (writer && o.saveNotes ? '<button class="lb-b" id="lb-notes" title="Save this board as the class notes for students">💾 Class notes</button>' : '') +
+      '<button class="lb-b lb-xf" id="lb-fs" title="Browser full screen">⛶</button>' +
+      '<button class="lb-b lb-xi" id="lb-exp" title="Make the whiteboard fill the whole screen">⤢ Full screen</button><button class="lb-b lb-xi" id="lb-x" title="Close the whiteboard" aria-label="Close">✕</button></div>' +
       '<div class="lb-body">' + (writer ? '<div class="lb-tools" id="lb-tools">' + tools + '</div>' : '') +
       '<div class="lb-stage" id="lb-stage"><canvas id="lb-c"></canvas><div class="lb-bn" id="lb-bn"></div>' +
       '<div class="lb-view"><button class="lb-b" id="lb-zo" aria-label="Zoom out">−</button><span id="lb-zv">100%</span><button class="lb-b" id="lb-zi" aria-label="Zoom in">+</button><button class="lb-b" id="lb-fit" title="Fit everything on screen">Fit</button>' +
@@ -103,10 +115,11 @@ html.lb-open,html.lb-open body{overflow:hidden}\
 
   function start(o) {
     injectCss();
-    var root = document.createElement('div'); root.id = 'lbroot'; root.className = 'lb'; root.setAttribute('role', 'dialog'); root.setAttribute('aria-label', 'TTE LiveBoard');
+    var inline = !!(o.slot && o.slot.isConnected !== false);
+    var root = document.createElement('div'); root.id = 'lbroot'; root.className = 'lb ' + (inline ? 'lb-inline' : 'lb-full'); root.setAttribute('aria-label', 'TTE LiveBoard');
     root.innerHTML = template(o, !!o.isAdmin);
-    document.body.appendChild(root); document.documentElement.classList.add('lb-open');
-    S = { o: o, root: root, level: o.level || 'proper', week: o.week, mode: 'view', rev: 0, sid: uid(), n: 0, sv: 0, br: 0,
+    if (inline) { o.slot.textContent = ''; o.slot.appendChild(root); } else { document.body.appendChild(root); document.documentElement.classList.add('lb-open'); }
+    S = { o: o, root: root, inline: inline, expanded: !inline, slot: inline ? o.slot : null, level: o.level || 'proper', week: o.week, mode: 'view', rev: 0, sid: uid(), n: 0, sv: 0, br: 0,
       q: [], idx: new Map(), undo: [], redo: [], tool: 'pen', color: COLORS[0], width: 4, follow: true, loading: false, buf: [], temp: new Map(),
       chain: Promise.resolve(), chg: 0, dirty: false, lastMsg: 0, vsid: null, vlast: 0, need: null, needSid: null, snap: { sid: null, n: 0 }, timers: [], wtimers: [], closed: false, listeners: [] };
     bindChrome();
@@ -155,15 +168,19 @@ html.lb-open,html.lb-open body{overflow:hidden}\
     if (s.root && s.root.parentNode) s.root.parentNode.removeChild(s.root);
     document.documentElement.classList.remove('lb-open');
     if (S === s) S = null;
+    try { if (s.o.onClose) s.o.onClose(); } catch (e) { }
   }
 
   function on(el, ev, fn, opt) { el.addEventListener(ev, fn, opt); S.listeners.push([el, ev, fn, opt]); }
 
   function bindChrome() {
-    $('lb-back').onclick = function () { LB.close(); };
+    $('lb-back').onclick = function () { if (S.inline) setExpanded(false); else LB.close(); };
+    $('lb-x').onclick = function () { LB.close(); };
+    $('lb-exp').onclick = function () { setExpanded(true); };
     var fs = $('lb-fs');
     fs.onclick = function () { try { if (document.fullscreenElement) document.exitFullscreen(); else S.root.requestFullscreen(); } catch (e) { } };
     if (!document.fullscreenEnabled) fs.style.display = 'none';
+    on(window, 'resize', resize);
     $('lb-pdf').onclick = function () { exportNow('pdf'); };
     $('lb-png').onclick = function () { exportNow('png'); };
     var nb = $('lb-notes'); if (nb) nb.onclick = saveNotes;
@@ -177,6 +194,26 @@ html.lb-open,html.lb-open body{overflow:hidden}\
     on(document, 'visibilitychange', function () { if (document.hidden && S && S.mode === 'write' && S.dirty) save(); });
     on(window, 'online', function () { if (!S) return; if (S.mode === 'write') { S.chg++; dirty(); } else resync(); });
   }
+  function resize() { if (!S || !S.c || !S.stage) return; var w = S.stage.clientWidth, h = S.stage.clientHeight; if (w > 50 && h > 50) { S.c.setDimensions({ width: w, height: h }); S.c.requestRenderAll(); } }
+  function setExpanded(b) {
+    if (!S || !S.inline) return; var r = S.root;
+    if (b) { S.expanded = true; r.className = 'lb lb-full'; document.body.appendChild(r); document.documentElement.classList.add('lb-open'); }
+    else {
+      var sl = document.getElementById('lbslot') || S.slot;
+      if (!sl || sl.isConnected === false) return;
+      S.expanded = false; r.className = 'lb lb-inline'; document.documentElement.classList.remove('lb-open');
+      try { if (document.fullscreenElement) document.exitFullscreen(); } catch (e) { }
+      sl.textContent = ''; sl.appendChild(r); S.slot = sl;
+    }
+    resize(); setTimeout(resize, 60);
+  }
+  /* the classroom page redraws itself now and then: put the board back into the new frame */
+  LB.attach = function (slot) {
+    if (!S || !S.inline || S.expanded || !slot) return;
+    if (S.root.parentNode !== slot) { slot.textContent = ''; slot.appendChild(S.root); }
+    S.slot = slot; resize();
+  };
+  LB.isExpanded = function () { return !!(S && S.expanded); };
   function setFollowBtn() { var f = $('lb-follow'); if (f) { f.textContent = S.follow ? 'Following' : 'Follow facilitator'; f.className = 'lb-b' + (S.follow ? ' on' : ''); } }
 
   /* ------------------------------------------------------------------ canvas */
@@ -187,7 +224,7 @@ html.lb-open,html.lb-open body{overflow:hidden}\
     S.c = c; S.stage = stage;
     c.setViewportTransform([1, 0, 0, 1, 40, 40]);
     if (typeof ResizeObserver !== 'undefined') {
-      S.ro = new ResizeObserver(function () { if (!S) return; var w = stage.clientWidth, h = stage.clientHeight; if (w > 50 && h > 50) { c.setDimensions({ width: w, height: h }); c.requestRenderAll(); } });
+      S.ro = new ResizeObserver(function () { resize(); });
       S.ro.observe(stage);
     }
     c.on('mouse:down', onDown); c.on('mouse:move', onMove); c.on('mouse:up', onUp);
@@ -531,6 +568,7 @@ html.lb-open,html.lb-open body{overflow:hidden}\
     S.applyingVp = false; afterView();
   }
   function onWheel(e) {
+    if (!S.expanded && !(e.ctrlKey || e.metaKey)) return;
     e.preventDefault();
     var r = S.stage.getBoundingClientRect();
     if (e.ctrlKey || e.metaKey) zoomBy(Math.exp(-e.deltaY * 0.01), e.clientX - r.left, e.clientY - r.top);
@@ -708,7 +746,8 @@ html.lb-open,html.lb-open body{overflow:hidden}\
   function onKey(e) {
     if (!S || S.mode !== 'write') return;
     var a = S.c.getActiveObject(); if (a && a.isEditing) return;
-    var tag = (e.target && e.target.tagName) || ''; if (/INPUT|TEXTAREA/.test(tag) && e.target.type !== 'range') return;
+    var tag = (e.target && e.target.tagName) || ''; if (/INPUT|TEXTAREA|SELECT/.test(tag) && e.target.type !== 'range') return;
+    if (e.target && e.target !== document.body && e.target.closest && !S.root.contains(e.target)) return;
     var k = e.key.toLowerCase();
     if ((e.ctrlKey || e.metaKey) && k === 'z') { e.preventDefault(); e.shiftKey ? doRedo() : doUndo(); }
     else if ((e.ctrlKey || e.metaKey) && k === 'y') { e.preventDefault(); doRedo(); }
