@@ -88,7 +88,7 @@ html.lb-open,html.lb-open body{overflow:hidden}\
   }
 
   var $ = function (id) { return S && S.root ? S.root.querySelector('#' + id) : null; };
-  function banner(html) { var b = $('lb-bn'); if (!b) return; if (!html) { b.className = 'lb-bn'; b.innerHTML = ''; return; } b.innerHTML = html; b.className = 'lb-bn on'; }
+  function banner(html, kind) { var b = $('lb-bn'); if (!b) return; S.bnKind = html ? (kind || '') : ''; if (!html) { b.className = 'lb-bn'; b.innerHTML = ''; return; } b.innerHTML = html; b.className = 'lb-bn on'; }
   function rpc(name, args) { return S.o.sb.rpc(name, args).then(function (r) { if (r.error) throw r.error; return r.data; }); }
 
   /* ------------------------------------------------------------------ open / close */
@@ -122,9 +122,9 @@ html.lb-open,html.lb-open body{overflow:hidden}\
     }).then(function () {
       if (S !== cur) return;
       applyMode(); connect(); setStatus();
-      if (S.mode === 'view' && S.holder) banner('<b>' + esc(S.holder) + '</b> is writing on this board. <button class="lb-b" id="lb-take">Take the pen</button>');
+      if (S.mode === 'view' && S.holder) banner('<b>' + esc(S.holder) + '</b> is writing on this board. <button class="lb-b" id="lb-take">Take the pen</button>', 'holder');
       var tk = $('lb-take'); if (tk) tk.onclick = function () { takePen(true); };
-      if (S.mode === 'view' && !S.holder && !S.c.getObjects().length) banner('The facilitator has not written on this board yet. It will appear here live.');
+      if (S.mode === 'view' && !S.holder && !S.c.getObjects().length) banner('The facilitator has not written on this board yet. It will appear here live.', 'empty');
     }).catch(function (e) {
       if (S === cur) { setStatus(); banner('⚠️ ' + esc(e && e.message ? e.message : e) + (/tte_board|function|relation/i.test(String(e && e.message)) ? '<br><small>Has tte_liveboard.sql been run in Supabase?</small>' : '')); }
     });
@@ -278,7 +278,7 @@ html.lb-open,html.lb-open body{overflow:hidden}\
     if (b.ops && b.ops.length) {
       if (S.loading) S.buf.push(b.ops); else applyOpsNow(b.ops);
     }
-    banner('');
+    if (S.bnKind === 'empty') banner('');
     setStatus();
   }
 
@@ -440,7 +440,7 @@ html.lb-open,html.lb-open body{overflow:hidden}\
     S.mode = 'view'; S.q = []; S.idx.clear(); S.dirty = false; S.drawing = false; S.stroke = null; S.shape = null;
     if (S.ft) { clearTimeout(S.ft); S.ft = null; } if (S.st) { clearTimeout(S.st); S.st = null; }
     S.wtimers.forEach(function (t) { clearTimeout(t); clearInterval(t); }); S.wtimers = []; S.wt = false;
-    applyMode(); resyncSoon(); banner(esc(msg) + (S.o.isAdmin ? ' <button class="lb-b" id="lb-take">Take the pen</button>' : ''));
+    applyMode(); resyncSoon(); banner(esc(msg) + (S.o.isAdmin ? ' <button class="lb-b" id="lb-take">Take the pen</button>' : ''), 'holder');
     var tk = $('lb-take'); if (tk) tk.onclick = function () { takePen(true); };
     setStatus(); startViewerTimers();
   }
@@ -735,7 +735,11 @@ html.lb-open,html.lb-open body{overflow:hidden}\
       });
     });
   }
-  function toBlob(url) { return fetch(url).then(function (r) { return r.blob(); }); }
+  function toBlob(url) {
+    var parts = url.split(','), mime = (parts[0].match(/:(.*?);/) || [0, 'image/png'])[1], bin = atob(parts[1]), u8 = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+    return Promise.resolve(new Blob([u8], { type: mime }));
+  }
   function makePdf(img) {
     return need(PDF, function () { return window.jspdf; }).then(function () {
       var J = window.jspdf.jsPDF, pdf = new J({ orientation: img.w >= img.h ? 'l' : 'p', unit: 'px', format: [img.w, img.h], hotfixes: ['px_scaling'], compress: true });
