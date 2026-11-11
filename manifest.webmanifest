@@ -1,0 +1,23 @@
+{
+  "id": "classroom.html",
+  "name": "Thought Transformation Education",
+  "short_name": "TTE",
+  "description": "The TTE classroom: live classes, lessons, attendance and the LiveBoard.",
+  "start_url": "classroom.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#071a45",
+  "theme_color": "#071a45",
+  "lang": "en",
+  "categories": ["education"],
+  "icons": [
+    { "src": "tte-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "tte-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "tte-icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "My dashboard", "short_name": "Dashboard", "url": "classroom.html#dashboard" },
+    { "name": "Classroom", "url": "classroom.html#classroom" }
+  ]
+}
