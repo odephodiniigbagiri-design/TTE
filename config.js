@@ -9,7 +9,7 @@ window.TTE_CONFIG = {
   // Contact cards. They are shown ONLY on the home page, in this order. Add or remove cards here.
   // Each card can have: name, phone, whatsapp, email, address (leave out what you do not need).
   contacts: [
-    { name: 'General enquiries', phone: '08037505545', whatsapp: '08077553611', email: 'rodonamemiboh@gmail.com' },
+    { name: 'For more enquiries', phone: '08037505545', whatsapp: '08077553611', email: 'rodonamemiboh@gmail.com' },
     { name: 'Dixon Igoni', phone: '+1 (646) 361-3705', address: '3555 Olinville Ave, Apt 2A, Bronx, NY 10467' },
     { name: 'Igoni Igoni', phone: '+1 (414) 522-4763', address: '8703 W Cheyenne St, Milwaukee, WI 53224' }
   ]
